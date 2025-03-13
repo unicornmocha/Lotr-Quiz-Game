@@ -1,4 +1,6 @@
 import tkinter as tk
+import os
+import sys
 from tkinter import messagebox
 
 # List of questions
@@ -31,15 +33,38 @@ class QuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("LOTR Quiz Game")
+
+        # Determine the icon path based on whether it's running in PyInstaller or development mode
+        if getattr(sys, 'frozen', False):
+            icon_path = os.path.join(sys._MEIPASS, "lotr_icon.png")  # Path for bundled resources
+        else:
+            icon_path = "lotr_icon.png"  # Regular path if running in the development environment
+
+        # Set the icon for the window
+        self.root.iconphoto(True, tk.PhotoImage(file=icon_path))
+
         self.question_index = 0
         self.score = 0
 
-        self.question_label = tk.Label(root, text="", wraplength=400, font=("Arial", 14))
+        # Welcome Screen
+        self.welcome_label = tk.Label(root, text="Let's see if you are a real LOTR fan or just a poser!",
+                                      wraplength=400, font=("Arial", 16), padx=20, pady=20)
+        self.welcome_label.pack()
+
+        self.play_button = tk.Button(root, text="Play", font=("Arial", 14), command=self.start_quiz)
+        self.play_button.pack(pady=20)
+
+    def start_quiz(self):
+        # Hide welcome screen and show quiz questions
+        self.welcome_label.pack_forget()
+        self.play_button.pack_forget()
+
+        self.question_label = tk.Label(self.root, text="", wraplength=400, font=("Arial", 14))
         self.question_label.pack(pady=20)
 
         self.buttons = []
         for i in range(4):
-            btn = tk.Button(root, text="", font=("Arial", 12), width=30, command=lambda i=i: self.check_answer(i))
+            btn = tk.Button(self.root, text="", font=("Arial", 12), width=30, command=lambda i=i: self.check_answer(i))
             btn.pack(pady=5)
             self.buttons.append(btn)
 
@@ -64,7 +89,17 @@ class QuizApp:
         self.next_question()
 
     def show_results(self):
-        messagebox.showinfo("Quiz Over", f"You got {self.score} out of {len(questions)} correct!")
+        # Display the score message
+        score_message = f"You got {self.score} out of {len(questions)} correct!"
+
+        # Additional message based on the score
+        if self.score > 5:
+            extra_message = "Heh, looks like you were a real fan after all!"
+        else:
+            extra_message = "Pff, I knew you were a poser!"
+
+        # Show the results in a message box
+        messagebox.showinfo("Quiz Over", f"{score_message}\n\n{extra_message}")
         self.root.quit()
 
 
