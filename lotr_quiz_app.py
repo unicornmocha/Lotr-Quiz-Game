@@ -33,6 +33,15 @@ class QuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("LOTR Quiz Game")
+        window_width = 500
+        window_height = 400
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        x_position = (screen_width // 2) - (window_width // 2)
+        y_position = (screen_height // 2) - (window_height // 2)
+
+        self.root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
         # Determine the icon path based on whether it's running in PyInstaller or development mode
         if getattr(sys, 'frozen', False):
@@ -47,20 +56,35 @@ class QuizApp:
         self.score = 0
 
         # Welcome Screen
-        self.welcome_label = tk.Label(root, text="Let's see if you are a real LOTR fan or just a poser!",
-                                      wraplength=400, font=("Arial", 16), padx=20, pady=20)
-        self.welcome_label.pack()
+        self.welcome_frame = tk.Frame(root)
+        self.welcome_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        self.play_button = tk.Button(root, text="Play", font=("Arial", 14), command=self.start_quiz)
-        self.play_button.pack(pady=20)
+        self.welcome_label = tk.Label(
+            self.welcome_frame,
+            text="Let's see if you are a real LOTR fan or just a poser!",
+            font=("Arial", 16), wraplength=400, justify="center"
+        )
+        self.welcome_label.pack(pady=(20, 20))  # Same padding as the quiz screen
+
+        self.start_button = tk.Button(
+            self.welcome_frame, text="Play", font=("Arial", 14),
+            command=self.start_quiz, width=15
+        )
+        self.start_button.pack(pady=10)
+
+        self.root.geometry("500x400")  # Sets the window size to 500x400 pixels
+        self.root.resizable(False, False)  # Prevents resizing
 
     def start_quiz(self):
-        # Hide welcome screen and show quiz questions
-        self.welcome_label.pack_forget()
-        self.play_button.pack_forget()
+        """Removes welcome screen and starts the quiz."""
+        self.welcome_frame.destroy()  # Hide the welcome screen
 
-        self.question_label = tk.Label(self.root, text="", wraplength=400, font=("Arial", 14))
-        self.question_label.pack(pady=20)
+        # Create a frame to center content
+        self.frame = tk.Frame(root)
+        self.frame.place(relx=0.5, rely=0.5, anchor="center")  # Centers the frame
+
+        self.question_label = tk.Label(self.root, text="", wraplength=400, font=("Arial", 14), justify="center")
+        self.question_label.pack(pady=(80, 20))
 
         self.buttons = []
         for i in range(4):
